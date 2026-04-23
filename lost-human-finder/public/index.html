@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Khoya Insaan — Lost Human Finder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0f;
+      --surface: #17171c;
+      --surface2: #1f1f27;
+      --accent: #e8a020;
+      --accent2: #f0c060;
+      --danger: #e05050;
+      --success: #50c878;
+      --text: #f0ede8;
+      --muted: #888;
+      --border: #2a2a35;
+      --radius: 12px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Lato', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ──── HEADER ──── */
+    header {
+      background: linear-gradient(135deg, #0d0d0f 60%, #1a1208);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 70px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+    }
+    .logo span { color: var(--text); font-weight: 700; }
+    nav { display: flex; gap: 8px; }
+    nav button {
+      background: none; border: 1px solid transparent;
+      color: var(--muted); font-family: 'Lato', sans-serif;
+      font-size: 0.88rem; padding: 8px 18px; border-radius: 6px;
+      cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px;
+    }
+    nav button:hover, nav button.active {
+      border-color: var(--accent); color: var(--accent);
+      background: rgba(232,160,32,0.08);
+    }
+
+    /* ──── HERO ──── */
+    .hero {
+      text-align: center; padding: 70px 20px 50px;
+      background: radial-gradient(ellipse at 50% 0%, rgba(232,160,32,0.07) 0%, transparent 70%);
+    }
+    .hero-badge {
+      display: inline-block; background: rgba(232,160,32,0.12);
+      border: 1px solid rgba(232,160,32,0.3); color: var(--accent);
+      font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase;
+      padding: 6px 16px; border-radius: 50px; margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      font-weight: 900; line-height: 1.15;
+      color: var(--text); margin-bottom: 16px;
+    }
+    .hero h1 em { color: var(--accent); font-style: normal; }
+    .hero p {
+      color: var(--muted); font-size: 1rem; max-width: 500px;
+      margin: 0 auto 36px; line-height: 1.7; font-weight: 300;
+    }
+    .hero-stats {
+      display: flex; gap: 40px; justify-content: center; flex-wrap: wrap;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem; font-weight: 900; color: var(--accent);
+      line-height: 1;
+    }
+    .stat-label { font-size: 0.75rem; color: var(--muted); letter-spacing: 1px; margin-top: 4px; }
+
+    /* ──── PAGES ──── */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ──── SECTION HEADER ──── */
+    .section-header {
+      max-width: 900px; margin: 0 auto; padding: 40px 20px 20px;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem; font-weight: 700; color: var(--text);
+    }
+    .section-title span { color: var(--accent); }
+
+    /* ──── FORM ──── */
+    .form-wrap {
+      max-width: 700px; margin: 0 auto; padding: 0 20px 60px;
+    }
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 36px;
+    }
+    .form-card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; margin-bottom: 28px; color: var(--accent);
+    }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .form-grid.full { grid-template-columns: 1fr; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field.span2 { grid-column: span 2; }
+    label { font-size: 0.78rem; color: var(--muted); letter-spacing: 0.8px; text-transform: uppercase; }
+    input, select, textarea {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); font-family: 'Lato', sans-serif;
+      font-size: 0.95rem; padding: 12px 14px; border-radius: 8px;
+      outline: none; transition: border 0.2s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 90px; }
+    select option { background: var(--surface2); }
+
+    .photo-upload {
+      border: 2px dashed var(--border); border-radius: 8px;
+      padding: 30px; text-align: center; cursor: pointer;
+      transition: border-color 0.2s; position: relative;
+    }
+    .photo-upload:hover { border-color: var(--accent); }
+    .photo-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .photo-upload-icon { font-size: 2rem; margin-bottom: 8px; }
+    .photo-upload p { font-size: 0.85rem; color: var(--muted); }
+    .photo-upload .preview {
+      width: 100px; height: 100px; border-radius: 8px;
+      object-fit: cover; margin: 0 auto 8px; display: none;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 28px; border-radius: 8px; font-family: 'Lato', sans-serif;
+      font-size: 0.92rem; font-weight: 700; letter-spacing: 0.5px;
+      cursor: pointer; border: none; transition: all 0.2s;
+    }
+    .btn-primary {
+      background: var(--accent); color: #0d0d0f;
+    }
+    .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: #c04040; }
+    .btn-outline {
+      background: none; border: 1px solid var(--accent);
+      color: var(--accent);
+    }
+    .btn-outline:hover { background: rgba(232,160,32,0.1); }
+    .btn-sm { padding: 7px 14px; font-size: 0.8rem; }
+
+    /* ──── SEARCH BAR ──── */
+    .search-wrap { max-width: 900px; margin: 0 auto; padding: 0 20px 28px; }
+    .search-bar {
+      display: flex; gap: 12px; flex-wrap: wrap;
+    }
+    .search-bar input {
+      flex: 1; min-width: 200px;
+      padding: 12px 18px; border-radius: 8px;
+    }
+    .search-bar select { min-width: 150px; }
+
+    /* ──── CARDS GRID ──── */
+    .cards-grid {
+      max-width: 900px; margin: 0 auto; padding: 0 20px 60px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px;
+    }
+    .person-card {
+      background: var(--surface);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; transition: transform 0.2s, border-color 0.2s;
+      cursor: pointer;
+    }
+    .person-card:hover { transform: translateY(-3px); border-color: var(--accent); }
+    .card-img {
+      width: 100%; height: 200px; object-fit: cover;
+      background: var(--surface2); display: flex;
+      align-items: center; justify-content: center;
+      font-size: 4rem; color: var(--muted);
+    }
+    .card-img img { width: 100%; height: 100%; object-fit: cover; }
+    .card-body { padding: 18px; }
+    .card-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 6px;
+    }
+    .card-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .tag {
+      font-size: 0.72rem; padding: 3px 9px; border-radius: 20px;
+      font-weight: 700; letter-spacing: 0.5px;
+    }
+    .tag-missing { background: rgba(224,80,80,0.15); color: var(--danger); border: 1px solid rgba(224,80,80,0.3); }
+    .tag-found { background: rgba(80,200,120,0.15); color: var(--success); border: 1px solid rgba(80,200,120,0.3); }
+    .tag-info { background: rgba(232,160,32,0.12); color: var(--accent); border: 1px solid rgba(232,160,32,0.3); }
+    .card-detail { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+    .card-actions { padding: 12px 18px; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+
+    /* ──── MODAL ──── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(4px); z-index: 200;
+      display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); max-width: 600px; width: 100%;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .modal-header {
+      padding: 24px 28px 0;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-header h3 {
+      font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--accent);
+    }
+    .modal-close {
+      background: none; border: none; color: var(--muted);
+      font-size: 1.4rem; cursor: pointer; transition: color 0.2s; line-height: 1;
+    }
+    .modal-close:hover { color: var(--text); }
+    .modal-body { padding: 20px 28px 28px; }
+    .modal-img {
+      width: 100%; max-height: 280px; object-fit: cover;
+      border-radius: 8px; margin-bottom: 20px;
+    }
+    .modal-row { display: flex; gap: 8px; margin-bottom: 8px; font-size: 0.9rem; }
+    .modal-row .lbl { color: var(--muted); min-width: 110px; font-size: 0.78rem; letter-spacing: 0.5px; text-transform: uppercase; }
+    .modal-row .val { color: var(--text); }
+
+    /* ──── TOAST ──── */
+    #toast {
+      position: fixed; bottom: 30px; right: 30px; z-index: 999;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 22px;
+      font-size: 0.88rem; color: var(--text);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      transform: translateY(20px); opacity: 0;
+      transition: all 0.3s; pointer-events: none;
+      display: flex; align-items: center; gap: 10px;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast.success { border-color: var(--success); }
+    #toast.error { border-color: var(--danger); }
+
+    /* ──── LOADING ──── */
+    .spinner {
+      width: 36px; height: 36px; border: 3px solid var(--border);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin 0.7s linear infinite; margin: 40px auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty-state {
+      text-align: center; padding: 60px 20px; color: var(--muted);
+    }
+    .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+    .empty-state p { font-size: 0.9rem; }
+
+    @media (max-width: 600px) {
+      header { padding: 0 16px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .field.span2 { grid-column: span 1; }
+      .form-card { padding: 22px; }
+      .hero { padding: 50px 16px 36px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">Khoya<span>Insaan</span></div>
+  <nav>
+    <button class="active" onclick="showPage('home')">Home</button>
+    <button onclick="showPage('report')">Report</button>
+    <button onclick="showPage('search')">Search</button>
+  </nav>
+</header>
+
+<!-- HOME PAGE -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-badge">🔍 Missing Persons Registry</div>
+    <h1>Khoya Insaan<br/><em>Dhundhne Mein Madad</em></h1>
+    <p>Kisi laapta vyakti ki report karein ya kisi ko pehchanein. Ek platform jo umeed ko zinda rakhta hai.</p>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num" id="stat-total">—</div>
+        <div class="stat-label">Total Cases</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="stat-missing">—</div>
+        <div class="stat-label">Missing</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="stat-found">—</div>
+        <div class="stat-label">Found</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Cards on Home -->
+  <div class="section-header">
+    <div class="section-title">Haal Ki <span>Entries</span></div>
+    <button class="btn btn-primary" onclick="showPage('report')">+ Nayi Report</button>
+  </div>
+  <div class="cards-grid" id="home-cards">
+    <div class="spinner"></div>
+  </div>
+</div>
+
+<!-- REPORT PAGE -->
+<div id="page-report" class="page">
+  <div class="section-header">
+    <div class="section-title">Laapta Vyakti <span>Ki Report</span></div>
+  </div>
+  <div class="form-wrap">
+    <div class="form-card">
+      <h2>📋 Report Form</h2>
+      <div class="form-grid">
+        <div class="field">
+          <label>Poora Naam *</label>
+          <input type="text" id="f-name" placeholder="e.g. Ramesh Kumar" />
+        </div>
+        <div class="field">
+          <label>Umar (Saal) *</label>
+          <input type="number" id="f-age" placeholder="e.g. 35" min="0" max="120" />
+        </div>
+        <div class="field">
+          <label>Ling</label>
+          <select id="f-gender">
+            <option value="">Chunein</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Laapta Hone Ki Tarikh</label>
+          <input type="date" id="f-date" />
+        </div>
+        <div class="field span2">
+          <label>Aakhri Baar Kahan Dekha Gaya</label>
+          <input type="text" id="f-location" placeholder="e.g. Connaught Place, Delhi" />
+        </div>
+        <div class="field">
+          <label>Reporter Ka Naam *</label>
+          <input type="text" id="f-reporter" placeholder="Aapka naam" />
+        </div>
+        <div class="field">
+          <label>Contact Number *</label>
+          <input type="tel" id="f-contact" placeholder="e.g. 9876543210" />
+        </div>
+        <div class="field span2">
+          <label>Pehchan Ya Khaas Baat</label>
+          <textarea id="f-desc" placeholder="Kapde, nishaan, koi khaas cheez..."></textarea>
+        </div>
+        <div class="field span2">
+          <label>Photo Upload</label>
+          <div class="photo-upload" id="photo-zone">
+            <input type="file" id="f-photo" accept="image/*" onchange="previewPhoto(event)" />
+            <img class="preview" id="photo-preview" />
+            <div class="photo-upload-icon" id="upload-icon">📷</div>
+            <p id="upload-text">Click karein ya photo drag karein (optional)</p>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:24px; display:flex; gap:12px; flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="submitReport()">✅ Report Submit Karein</button>
+        <button class="btn btn-outline" onclick="clearForm()">🗑 Saaf Karein</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SEARCH PAGE -->
+<div id="page-search" class="page">
+  <div class="section-header">
+    <div class="section-title">Khoje <span>Records</span></div>
+  </div>
+  <div class="search-wrap">
+    <div class="search-bar">
+      <input type="text" id="s-query" placeholder="Naam, jagah ya koi cheez..." oninput="doSearch()" />
+      <select id="s-status" onchange="doSearch()">
+        <option value="">Sabhi Status</option>
+        <option value="missing">Missing</option>
+        <option value="found">Found</option>
+      </select>
+      <select id="s-gender" onchange="doSearch()">
+        <option value="">Sabhi Ling</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+  </div>
+  <div class="cards-grid" id="search-cards">
+    <div class="empty-state" style="grid-column:1/-1">
+      <div class="icon">🔍</div>
+      <p>Kuch type karein ya filter lagayen</p>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Vyakti Vivaran</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+  const API = 'http://localhost:5000/api';
+
+  // ── Page Navigation ──
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    event.target.classList.add('active');
+    if (name === 'home') loadHome();
+    if (name === 'search') doSearch();
+  }
+
+  // ── Toast ──
+  function toast(msg, type = 'info') {
+    const el = document.getElementById('toast');
+    el.textContent = (type === 'success' ? '✅ ' : type === 'error' ? '✅ ' : 'ℹ️ ') + msg;
+    el.className = 'show ' + type;
+    setTimeout(() => el.className = '', 3000);
+  }
+
+  // ── Photo Preview ──
+  function previewPhoto(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const prev = document.getElementById('photo-preview');
+      prev.src = ev.target.result;
+      prev.style.display = 'block';
+      document.getElementById('upload-icon').style.display = 'none';
+      document.getElementById('upload-text').textContent = file.name;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ── Build Card HTML ──
+  function buildCard(p) {
+    const statusTag = p.status === 'found'
+      ? '<span class="tag tag-found">✅ Mil Gaya</span>'
+      : '<span class="tag tag-missing">🔴 Laapta</span>';
+    const img = p.photoUrl
+      ? `<img src="${API.replace('/api','')}/uploads/${p.photoUrl}" alt="photo" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='👤'" />`
+      : '👤';
+    return `
+      <div class="person-card" onclick="openModal('${p._id}')">
+        <div class="card-img">${img}</div>
+        <div class="card-body">
+          <div class="card-name">${p.name}</div>
+          <div class="card-meta">${statusTag}<span class="tag tag-info">${p.gender || 'N/A'}</span></div>
+          <div class="card-detail">
+            🎂 Umar: ${p.age || '?'} Saal<br/>
+            📍 ${p.lastSeenLocation || 'Jagah nahi pata'}<br/>
+            📅 ${p.missingDate ? new Date(p.missingDate).toLocaleDateString('hi-IN') : '—'}
+          </div>
+        </div>
+        <div class="card-actions">
+          ${p.status === 'missing'
+            ? `<button class="btn btn-sm btn-primary" onclick="event.stopPropagation();markFound('${p._id}')">✅ Mila</button>`
+            : `<button class="btn btn-sm btn-outline" disabled>Mil Chuka</button>`}
+          <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteRecord('${p._id}')">🗑</button>
+        </div>
+      </div>`;
+  }
+
+  // ── Load Home ──
+  async function loadHome() {
+    const grid = document.getElementById('home-cards');
+    grid.innerHTML = '<div class="spinner"></div>';
+    try {
+      const res = await fetch(`${API}/persons?limit=6`);
+      const data = await res.json();
+      renderStats(data.stats);
+      if (!data.persons.length) {
+        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="icon">📭</div><p>Abhi koi record nahi hai</p></div>';
+      } else {
+        grid.innerHTML = data.persons.map(buildCard).join('');
+      }
+    } catch {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="icon">⚠️</div><p>Server se connect nahi ho pa raha. Backend chalu hai?</p></div>';
+    }
+  }
+
+  function renderStats(stats) {
+    if (!stats) return;
+    document.getElementById('stat-total').textContent = stats.total ?? '—';
+    document.getElementById('stat-missing').textContent = stats.missing ?? '—';
+    document.getElementById('stat-found').textContent = stats.found ?? '—';
+  }
+
+  // ── Search ──
+  let searchTimer;
+  function doSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(runSearch, 300);
+  }
+
+  async function runSearch() {
+    const q = document.getElementById('s-query').value.trim();
+    const status = document.getElementById('s-status').value;
+    const gender = document.getElementById('s-gender').value;
+    const grid = document.getElementById('search-cards');
+
+    if (!q && !status && !gender) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="icon">🔍</div><p>Kuch type karein ya filter lagayen</p></div>';
+      return;
+    }
+
+    grid.innerHTML = '<div class="spinner"></div>';
+    const params = new URLSearchParams();
+    if (q) params.set('q', q);
+    if (status) params.set('status', status);
+    if (gender) params.set('gender', gender);
+
+    try {
+      const res = await fetch(`${API}/persons?${params}`);
+      const data = await res.json();
+      grid.innerHTML = data.persons.length
+        ? data.persons.map(buildCard).join('')
+        : '<div class="empty-state" style="grid-column:1/-1"><div class="icon">😔</div><p>Koi record nahi mila</p></div>';
+    } catch {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="icon">⚠️</div><p>Server error</p></div>';
+    }
+  }
+
+  // ── Submit Report ──
+  async function submitReport() {
+    const name = document.getElementById('f-name').value.trim();
+    const age = document.getElementById('f-age').value;
+    const reporter = document.getElementById('f-reporter').value.trim();
+    const contact = document.getElementById('f-contact').value.trim();
+
+    if (!name || !reporter || !contact) {
+      toast('Naam, Reporter aur Contact zaroori hai!', 'error'); return;
+    }
+
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('age', age);
+    formData.append('gender', document.getElementById('f-gender').value);
+    formData.append('missingDate', document.getElementById('f-date').value);
+    formData.append('lastSeenLocation', document.getElementById('f-location').value.trim());
+    formData.append('description', document.getElementById('f-desc').value.trim());
+    formData.append('reporterName', reporter);
+    formData.append('contactNumber', contact);
+
+    const photoFile = document.getElementById('f-photo').files[0];
+    if (photoFile) formData.append('photo', photoFile);
+
+    try {
+      const res = await fetch(`${API}/persons`, { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.success) {
+        toast('Report safaltapoorvak submit ho gayi!', 'success');
+        clearForm();
+        showPage('home');
+      } else {
+        toast(data.message || 'Kuch gadbad hui', 'error');
+      }
+    } catch {
+      toast('Ho Gya Report Darz!', 'error');
+    }
+  }
+
+  function clearForm() {
+    ['f-name','f-age','f-location','f-reporter','f-contact','f-desc','f-date'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('f-gender').value = '';
+    document.getElementById('f-photo').value = '';
+    document.getElementById('photo-preview').style.display = 'none';
+    document.getElementById('upload-icon').style.display = 'block';
+    document.getElementById('upload-text').textContent = 'Click karein ya photo drag karein (optional)';
+  }
+
+  // ── Modal ──
+  async function openModal(id) {
+    try {
+      const res = await fetch(`${API}/persons/${id}`);
+      const p = await res.json();
+      document.getElementById('modal-title').textContent = p.name;
+      const imgHtml = p.photoUrl
+        ? `<img src="${API.replace('/api','')}/uploads/${p.photoUrl}" class="modal-img" onerror="this.style.display='none'" />`
+        : '';
+      document.getElementById('modal-body').innerHTML = `
+        ${imgHtml}
+        <div class="card-meta" style="margin-bottom:16px">
+          ${p.status === 'found'
+            ? '<span class="tag tag-found">✅ Mil Gaya</span>'
+            : '<span class="tag tag-missing">🔴 Laapta</span>'}
+          <span class="tag tag-info">${p.gender || 'N/A'}</span>
+        </div>
+        <div class="modal-row"><span class="lbl">Naam</span><span class="val">${p.name}</span></div>
+        <div class="modal-row"><span class="lbl">Umar</span><span class="val">${p.age || '?'} Saal</span></div>
+        <div class="modal-row"><span class="lbl">Laapta Tithi</span><span class="val">${p.missingDate ? new Date(p.missingDate).toLocaleDateString('hi-IN') : '—'}</span></div>
+        <div class="modal-row"><span class="lbl">Aakhri Jagah</span><span class="val">${p.lastSeenLocation || '—'}</span></div>
+        <div class="modal-row"><span class="lbl">Vivaran</span><span class="val">${p.description || '—'}</span></div>
+        <div class="modal-row"><span class="lbl">Reporter</span><span class="val">${p.reporterName}</span></div>
+        <div class="modal-row"><span class="lbl">Contact</span><span class="val">${p.contactNumber}</span></div>
+        <div class="modal-row"><span class="lbl">Report Date</span><span class="val">${new Date(p.createdAt).toLocaleDateString('hi-IN')}</span></div>
+        <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
+          ${p.status === 'missing'
+            ? `<button class="btn btn-primary btn-sm" onclick="markFound('${p._id}');closeModal()">✅ Mila Hai Mark Karein</button>`
+            : ''}
+          <button class="btn btn-danger btn-sm" onclick="deleteRecord('${p._id}');closeModal()">🗑 Delete Karein</button>
+        </div>
+      `;
+      document.getElementById('modal').classList.add('open');
+    } catch {
+      toast('Record load nahi ho saka', 'error');
+    }
+  }
+
+  function closeModal(e) {
+    if (!e || e.target === document.getElementById('modal') || e.type === 'click') {
+      document.getElementById('modal').classList.remove('open');
+    }
+  }
+
+  // ── Mark Found ──
+  async function markFound(id) {
+    try {
+      const res = await fetch(`${API}/persons/${id}/found`, { method: 'PATCH' });
+      const data = await res.json();
+      if (data.success) {
+        toast('Record update ho gaya — Mil Gaya!', 'success');
+        loadHome(); doSearch();
+      }
+    } catch { toast('Update nahi ho saka', 'error'); }
+  }
+
+  // ── Delete ──
+  async function deleteRecord(id) {
+    if (!confirm('Kya aap sach mein ye record delete karna chahte hain?')) return;
+    try {
+      const res = await fetch(`${API}/persons/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        toast('Record delete ho gaya', 'success');
+        loadHome(); doSearch();
+      }
+    } catch { toast('Delete nahi ho saka', 'error'); }
+  }
+
+  // ── Init ──
+  loadHome();
+</script>
+</body>
+</html>
