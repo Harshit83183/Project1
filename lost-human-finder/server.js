@@ -3,7 +3,9 @@ const mongoose = require('mongoose');
 const multer = require('multer');
 const cors = require('cors');
 const path = require('path');
-const fs = require('fs');
+
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -18,31 +20,29 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ── Uploads folder ──
-const uploadDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
-app.use('/uploads', express.static(uploadDir));
 
 // ── Static Frontend ──
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ── Multer (Photo Upload) ──
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
-  }
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET
 });
-const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) cb(null, true);
-    else cb(new Error('Sirf image files allowed hain!'));
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "lost-human-finder",
+    allowed_formats: ["jpg", "png", "jpeg"]
   }
 });
 
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }
+});
 // ── Mongoose Schema ──
 const PersonSchema = new mongoose.Schema({
   name:             { type: String, required: true, trim: true },
@@ -130,7 +130,7 @@ app.post('/api/persons', upload.single('photo'), async (req, res) => {
       description,
       reporterName,
       contactNumber,
-      photoUrl: req.file ? req.file.filename : null
+      photoUrl: req.file ? req.file.path : null
     });
 
     await person.save();
@@ -140,36 +140,78 @@ app.post('/api/persons', upload.single('photo'), async (req, res) => {
   }
 });
 
-// PATCH /api/persons/:id/found — Mark as Found
+// PATCH /api/persons/:id/found — Mark as Found (Admin Only)
 app.patch('/api/persons/:id/found', async (req, res) => {
   try {
+
+    const { password } = req.body;
+
+    if (password !== process.env.ADMIN_PASSWORD) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access Denied - Wrong Password'
+      });
+    }
+
     const person = await Person.findByIdAndUpdate(
       req.params.id,
       { status: 'found', foundDate: new Date() },
       { new: true }
     );
-    if (!person) return res.status(404).json({ success: false, message: 'Record nahi mila' });
-    res.json({ success: true, message: 'Found mark ho gaya!', person });
+
+    if (!person) {
+      return res.status(404).json({
+        success: false,
+        message: 'Record nahi mila'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Found mark ho gaya!',
+      person
+    });
+
   } catch (err) {
-    res.status(400).json({ success: false, message: 'Invalid ID' });
+    res.status(400).json({
+      success: false,
+      message: 'Invalid ID'
+    });
   }
 });
 
-// DELETE /api/persons/:id — Delete record
+// DELETE /api/persons/:id — Delete record (Admin Only)
 app.delete('/api/persons/:id', async (req, res) => {
   try {
-    const person = await Person.findByIdAndDelete(req.params.id);
-    if (!person) return res.status(404).json({ success: false, message: 'Record nahi mila' });
 
-    // Photo bhi delete karein agar hai to
-    if (person.photoUrl) {
-      const photoPath = path.join(uploadDir, person.photoUrl);
-      if (fs.existsSync(photoPath)) fs.unlinkSync(photoPath);
+    const password = req.query.password;
+
+    if (password !== process.env.ADMIN_PASSWORD) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access Denied - Wrong Password'
+      });
     }
 
-    res.json({ success: true, message: 'Record delete ho gaya' });
+    const person = await Person.findByIdAndDelete(req.params.id);
+
+    if (!person) {
+      return res.status(404).json({
+        success: false,
+        message: 'Record nahi mila'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Record delete ho gaya'
+    });
+
   } catch (err) {
-    res.status(400).json({ success: false, message: 'Invalid ID' });
+    res.status(400).json({
+      success: false,
+      message: 'Invalid ID'
+    });
   }
 });
 

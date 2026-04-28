@@ -657,28 +657,63 @@
 
   // ── Mark Found ──
   async function markFound(id) {
-    try {
-      const res = await fetch(`${API}/persons/${id}/found`, { method: 'PATCH' });
-      const data = await res.json();
-      if (data.success) {
-        toast('Record update ho gaya — Mil Gaya!', 'success');
-        loadHome(); doSearch();
-      }
-    } catch { toast('Update nahi ho saka', 'error'); }
+
+  const password = prompt("Admin Password daliyie:");
+
+  if (!password) return;
+
+  try {
+    const res = await fetch(`${API}/persons/${id}/found`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ password })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      toast('Record update ho gaya — Mil Gaya!', 'success');
+      loadHome();
+      doSearch();
+    } else {
+      toast(data.message || 'Wrong Password', 'error');
+    }
+
+  } catch {
+    toast('Update nahi ho saka', 'error');
   }
+}
 
   // ── Delete ──
   async function deleteRecord(id) {
-    if (!confirm('Kya aap sach mein ye record delete karna chahte hain?')) return;
-    try {
-      const res = await fetch(`${API}/persons/${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        toast('Record delete ho gaya', 'success');
-        loadHome(); doSearch();
-      }
-    } catch { toast('Delete nahi ho saka', 'error'); }
+
+  if (!confirm('Kya aap sach mein ye record delete karna chahte hain?')) return;
+
+  const password = prompt("Admin Password daliyie:");
+
+  if (!password) return;
+
+  try {
+    const res = await fetch(`${API}/persons/${id}?password=${encodeURIComponent(password)}`, {
+      method: 'DELETE'
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      toast('Record delete ho gaya', 'success');
+      loadHome();
+      doSearch();
+    } else {
+      toast(data.message || 'Wrong Password', 'error');
+    }
+
+  } catch {
+    toast('Delete nahi ho saka', 'error');
   }
+}
 
   // ── Init ──
   loadHome();
