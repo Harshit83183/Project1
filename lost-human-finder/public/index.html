@@ -563,55 +563,49 @@
 
   // ── Submit Report ──
   async function submitReport() {
-    const name = document.getElementById('f-name').value.trim();
-    const age = document.getElementById('f-age').value;
-    const reporter = document.getElementById('f-reporter').value.trim();
-    const contact = document.getElementById('f-contact').value.trim();
+  const name = document.getElementById('f-name').value.trim();
+  const age = document.getElementById('f-age').value;
+  const reporter = document.getElementById('f-reporter').value.trim();
+  const contact = document.getElementById('f-contact').value.trim();
 
-    if (!name || !reporter || !contact) {
-      toast('Naam, Reporter aur Contact zaroori hai!', 'error'); return;
+  if (!name || !reporter || !contact) {
+    toast('Naam, Reporter aur Contact zaroori hai!', 'error'); 
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('name', name);
+  formData.append('age', age);
+  formData.append('gender', document.getElementById('f-gender').value);
+  formData.append('missingDate', document.getElementById('f-date').value);
+  formData.append('lastSeenLocation', document.getElementById('f-location').value.trim());
+  formData.append('description', document.getElementById('f-desc').value.trim());
+  formData.append('reporterName', reporter);
+  formData.append('contactNumber', contact);
+
+  const photoFile = document.getElementById('f-photo').files[0];
+  if (photoFile) formData.append('photo', photoFile);
+
+  try {
+    const res = await fetch(`${API}/persons`, { 
+      method: 'POST', 
+      body: formData 
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      toast('Report safaltapoorvak submit ho gayi!', 'success');
+      clearForm();
+      showPage('home');
+    } else {
+      toast(data.message || 'Kuch gadbad hui', 'error');
     }
 
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('age', age);
-    formData.append('gender', document.getElementById('f-gender').value);
-    formData.append('missingDate', document.getElementById('f-date').value);
-    formData.append('lastSeenLocation', document.getElementById('f-location').value.trim());
-    formData.append('description', document.getElementById('f-desc').value.trim());
-    formData.append('reporterName', reporter);
-    formData.append('contactNumber', contact);
-
-    const photoFile = document.getElementById('f-photo').files[0];
-    if (photoFile) formData.append('photo', photoFile);
-
-    try {
-      const res = await fetch(`${API}/persons`, { 
-  method: 'POST', 
-  body: formData 
-});
-
-console.log("STATUS:", res.status);   // ✅ ADD THIS
-
-const data = await res.json();
-console.log("RESPONSE:", data);       // ✅ ADD THIS
-
-if (data.success) {
-  toast('Report safaltapoorvak submit ho gayi!', 'success');
-  clearForm();
-  showPage('home');
-} else {
-  toast(data.message || 'Kuch gadbad hui', 'error');
-}
-const photoFile = document.getElementById('f-photo').files[0];
-console.log("PHOTO FILE:", photoFile);   // ✅ ADD THIS
-
-if (photoFile) formData.append('photo', photoFile);
-    } catch (err) {
-  toast('Report submit nahi hui', 'error');
-  console.log(err);
-}
+  } catch (err) {
+    toast('Server error aaya', 'error');
   }
+}
 
   function clearForm() {
     ['f-name','f-age','f-location','f-reporter','f-contact','f-desc','f-date'].forEach(id => {
