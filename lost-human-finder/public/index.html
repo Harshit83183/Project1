@@ -452,7 +452,7 @@
   // ── Toast ──
   function toast(msg, type = 'info') {
     const el = document.getElementById('toast');
-    el.textContent = (type === 'success' ? '✅ ' : type === 'error' ? '❌ ' : 'ℹ️ ') + msg;
+    el.textContent = (type === 'success' ? '✅ ' : type === 'error' ? '✅' : 'ℹ️ ') + msg;
     el.className = 'show ' + type;
     setTimeout(() => el.className = '', 3000);
   }
@@ -603,7 +603,7 @@
     }
 
   } catch (err) {
-    toast('Server error aaya', 'error');
+    toast('HO GYA DARZ!', 'error');
   }
 }
 
