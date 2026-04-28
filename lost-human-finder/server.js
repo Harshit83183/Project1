@@ -132,7 +132,7 @@ console.log("FILE:", req.file);
       description,
       reporterName,
       contactNumber,
-      photoUrl: req.file ? req.file.secure_url : null
+      photoUrl: req.file ? (req.file.secure_url || req.file.path) : null
     });
 
     await person.save();
