@@ -130,7 +130,7 @@ app.post('/api/persons', upload.single('photo'), async (req, res) => {
       description,
       reporterName,
       contactNumber,
-      photoUrl: req.file ? req.file.path : null
+      photoUrl: req.file ? req.file.secure_url : null
     });
 
     await person.save();
@@ -184,7 +184,7 @@ app.patch('/api/persons/:id/found', async (req, res) => {
 app.delete('/api/persons/:id', async (req, res) => {
   try {
 
-    const password = req.query.password;
+    const { password } = req.body;
 
     if (password !== process.env.ADMIN_PASSWORD) {
       return res.status(403).json({
