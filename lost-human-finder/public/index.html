@@ -586,15 +586,27 @@
     if (photoFile) formData.append('photo', photoFile);
 
     try {
-      const res = await fetch(`${API}/persons`, { method: 'POST', body: formData });
-      const data = await res.json();
-      if (data.success) {
-        toast('Report safaltapoorvak submit ho gayi!', 'success');
-        clearForm();
-        showPage('home');
-      } else {
-        toast(data.message || 'Kuch gadbad hui', 'error');
-      }
+      const res = await fetch(`${API}/persons`, { 
+  method: 'POST', 
+  body: formData 
+});
+
+console.log("STATUS:", res.status);   // ✅ ADD THIS
+
+const data = await res.json();
+console.log("RESPONSE:", data);       // ✅ ADD THIS
+
+if (data.success) {
+  toast('Report safaltapoorvak submit ho gayi!', 'success');
+  clearForm();
+  showPage('home');
+} else {
+  toast(data.message || 'Kuch gadbad hui', 'error');
+}
+const photoFile = document.getElementById('f-photo').files[0];
+console.log("PHOTO FILE:", photoFile);   // ✅ ADD THIS
+
+if (photoFile) formData.append('photo', photoFile);
     } catch (err) {
   toast('Report submit nahi hui', 'error');
   console.log(err);

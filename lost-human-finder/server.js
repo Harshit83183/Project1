@@ -115,6 +115,8 @@ app.get('/api/persons/:id', async (req, res) => {
 // POST /api/persons — New report
 app.post('/api/persons', upload.single('photo'), async (req, res) => {
   try {
+    console.log("BODY:", req.body);
+console.log("FILE:", req.file);
     const { name, age, gender, missingDate, lastSeenLocation, description, reporterName, contactNumber } = req.body;
 
     if (!name || !reporterName || !contactNumber) {
