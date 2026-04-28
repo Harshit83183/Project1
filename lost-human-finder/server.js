@@ -183,10 +183,9 @@ app.patch('/api/persons/:id/found', async (req, res) => {
 // DELETE /api/persons/:id — Delete record (Admin Only)
 app.delete('/api/persons/:id', async (req, res) => {
   try {
+    const password = req.query.password;
 
-    const { password } = req.body;
-
-    if (password !== process.env.ADMIN_PASSWORD) {
+    if (password?.trim() !== process.env.ADMIN_PASSWORD?.trim()) {
       return res.status(403).json({
         success: false,
         message: 'Access Denied - Wrong Password'
