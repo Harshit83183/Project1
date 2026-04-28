@@ -452,7 +452,7 @@
   // ── Toast ──
   function toast(msg, type = 'info') {
     const el = document.getElementById('toast');
-    el.textContent = (type === 'success' ? '✅ ' : type === 'error' ? '✅ ' : 'ℹ️ ') + msg;
+    el.textContent = (type === 'success' ? '✅ ' : type === 'error' ? '❌ ' : 'ℹ️ ') + msg;
     el.className = 'show ' + type;
     setTimeout(() => el.className = '', 3000);
   }
@@ -478,8 +478,8 @@
       ? '<span class="tag tag-found">✅ Mil Gaya</span>'
       : '<span class="tag tag-missing">🔴 Laapta</span>';
     const img = p.photoUrl
-      ? `<img src="${API.replace('/api','')}/uploads/${p.photoUrl}" alt="photo" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='👤'" />`
-      : '👤';
+ ? `<img src="${p.photoUrl}" alt="photo" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='👤'" />`
+ : '👤';
     return `
       <div class="person-card" onclick="openModal('${p._id}')">
         <div class="card-img">${img}</div>
@@ -595,9 +595,10 @@
       } else {
         toast(data.message || 'Kuch gadbad hui', 'error');
       }
-    } catch {
-      toast('Ho Gya Report Darz!', 'error');
-    }
+    } catch (err) {
+  toast('Report submit nahi hui', 'error');
+  console.log(err);
+}
   }
 
   function clearForm() {
@@ -618,7 +619,7 @@
       const p = await res.json();
       document.getElementById('modal-title').textContent = p.name;
       const imgHtml = p.photoUrl
-        ? `<img src="${API.replace('/api','')}/uploads/${p.photoUrl}" class="modal-img" onerror="this.style.display='none'" />`
+        ? `<img src="${p.photoUrl}" class="modal-img" onerror="this.style.display='none'" />`
         : '';
       document.getElementById('modal-body').innerHTML = `
         ${imgHtml}
